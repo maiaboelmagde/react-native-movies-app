@@ -7,6 +7,7 @@ import { FavouritesContext } from '../context/FavouritesContextProvider';
 
 export default function HomeScreen() {
   const {popularMovies, topRatedMovies, upcomingMovies, loading} = useContext(MoviesContext);
+  const allMovies = [...topRatedMovies,...popularMovies, ...upcomingMovies];
 
   const { favouriteIds, addFavourite, removeFavourite } = useContext(FavouritesContext);
 
@@ -16,16 +17,20 @@ export default function HomeScreen() {
   const getFilteredMovies = () => {
     let list = [];
     switch (selectedCategory) {
-      case 'popular':
-        list = popularMovies;
-        break;
-      case 'top_rated':
-        list = topRatedMovies;
-        break;
-      case 'upcoming':
-        list = upcomingMovies;
-        break;
+        case 'all_movies':
+            list = allMovies;
+            break
+        case 'popular':
+            list = popularMovies;
+            break;
+        case 'top_rated':
+            list = topRatedMovies;
+            break;
+        case 'upcoming':
+            list = upcomingMovies;
+            break;
     }
+    
     return list.filter((movie)=>{
         return movie.title.toLowerCase().includes(searchText.toLowerCase());
     });
@@ -61,6 +66,7 @@ export default function HomeScreen() {
                 onValueChange={(itemValue) => setSelectedCategory(itemValue)}
                 style={styles.picker}
             >
+                <Picker.Item label="All Movies" value="all_movies" />
                 <Picker.Item label="Popular" value="popular" />
                 <Picker.Item label="Top Movies" value="top_rated" />
                 <Picker.Item label="Upcoming Movies" value="upcoming" />
@@ -70,7 +76,7 @@ export default function HomeScreen() {
 
         <FlatList
             data={filteredMovies}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item,index) => (item.id+index).toString()}
             renderItem={({ item }) => (
                 <MovieCard 
                     movie={item} 
