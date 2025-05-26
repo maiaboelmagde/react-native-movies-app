@@ -1,6 +1,6 @@
 import { View, Text } from 'react-native';
 import React, { createContext, useEffect, useState } from 'react';
-import { PopularURL, TopRatedURL, UpcomingURL } from '../config';
+import { PopularURL, TopRatedURL, UpcomingURL } from '../utils/config';
 
 export const MoviesContext = createContext();
 

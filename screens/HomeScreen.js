@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { MoviesContext } from '../context/MoviesContextProvider';
+import MovieCard from '../components/MovieCard';
 
 export default function HomeScreen() {
   const {
@@ -12,6 +13,7 @@ export default function HomeScreen() {
   } = useContext(MoviesContext);
 
   const [selectedCategory, setSelectedCategory] = useState('popular');
+  const [favourites, setFavourites]=useState([]);
 
   const getFilteredMovies = () => {
     switch (selectedCategory) {
@@ -27,6 +29,18 @@ export default function HomeScreen() {
   };
 
   const filteredMovies = getFilteredMovies();
+
+  const toggleFav = (movie)=>{
+    exist = favourites.some((fav)=> fav.id === movie.id);
+    if(exist){
+        setFavourites(favourites.filter(fav=>fav.id !== movie.id));
+    }else{
+        setFavourites([...favourites,movie]);
+    }
+  }
+
+   const isFavourite = (movieId) =>
+    favourites.some((fav) => fav.id === movieId);
 
   if (loading) return <Text>Loading...</Text>;
 
@@ -46,7 +60,11 @@ export default function HomeScreen() {
         data={filteredMovies}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <Text style={styles.movie}>{item.title}</Text>
+            <MovieCard 
+                movie={item} 
+                isFavourite={isFavourite(item.id)} 
+                onToggleFavourite = {toggleFav}
+            ></MovieCard>
         )}
       />
     </View>
