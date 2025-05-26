@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native'
+import { View, Text, Image, StyleSheet } from 'react-native'
 import React, { useContext } from 'react'
 import FavMovieCard from '../components/FavMovieCard';
 import { MoviesContext } from '../context/MoviesContextProvider';
@@ -31,18 +31,58 @@ export default function FavouritesScreen() {
     };
 
     return (
-        <View>
-            <FlatList
-                data={favouriteMovies}
-                keyExtractor={(item, index) => (item.id + index).toString()}
-                renderItem={({ item }) => (
-                    <FavMovieCard
-                        movie={item}
-                        isFavourite={isFavourite(item.id)}
-                        onToggleFavourite={toggleFav}
-                    ></FavMovieCard>
-                )}
-            />
+        <View style={styles.container}>
+            {favouriteMovies.length == 0 ?
+                (
+                    <View style={styles.emptyContainer}>
+                        <Image
+                            source={require('../assets/fav.png')}
+                            style={styles.emptyImage}
+                        />
+                        <Text style={styles.emptyText}>No favourites yet</Text>
+                        <Text style={styles.emptyText}>Favourites Movies would be shown here</Text>
+
+                    </View>
+                )
+                :
+                (
+                    <FlatList
+                        data={favouriteMovies}
+                        keyExtractor={(item, index) => (item.id + index).toString()}
+                        renderItem={({ item }) => (
+                            <FavMovieCard
+                                movie={item}
+                                isFavourite={isFavourite(item.id)}
+                                onToggleFavourite={toggleFav}
+                            ></FavMovieCard>
+                        )}
+                    />
+                )
+            }
+
         </View>
     )
 }
+
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        padding: 10,
+        height:'100%'
+    },
+    emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    emptyImage: {
+        width: 200,
+        height: 200,
+        marginBottom: 20,
+    },
+    emptyText: {
+        fontSize: 18,
+        color: '#888',
+    },
+});
