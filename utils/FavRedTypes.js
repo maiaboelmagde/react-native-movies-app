@@ -1,0 +1,5 @@
+export default FavRedTypes = Object.freeze({
+    LOAD_FAVOURITES:'LOAD_FAVOURITES',
+    ADD_FAVOURITE : 'ADD_FAVOURITE',
+    REMOVE_FAVOURITE: 'REMOVE_FAVOURITE'
+})

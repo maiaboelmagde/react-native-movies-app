@@ -3,17 +3,14 @@ import { View, Text, FlatList, StyleSheet, TextInput } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { MoviesContext } from '../context/MoviesContextProvider';
 import MovieCard from '../components/MovieCard';
+import { FavouritesContext } from '../context/FavouritesContextProvider';
 
 export default function HomeScreen() {
-  const {
-    popularMovies,
-    topRatedMovies,
-    upcomingMovies,
-    loading,
-  } = useContext(MoviesContext);
+  const {popularMovies, topRatedMovies, upcomingMovies, loading} = useContext(MoviesContext);
+
+  const { favouriteIds, addFavourite, removeFavourite } = useContext(FavouritesContext);
 
   const [selectedCategory, setSelectedCategory] = useState('popular');
-  const [favourites, setFavourites] = useState([]);
   const [searchText, setSearchText] = useState('');
 
   const getFilteredMovies = () => {
@@ -37,16 +34,15 @@ export default function HomeScreen() {
   const filteredMovies = getFilteredMovies();
 
   const toggleFav = (movie)=>{
-    const exist = favourites.some((fav)=> fav.id === movie.id);
+    const exist = favouriteIds.includes(movie.id);
     if(exist){
-        setFavourites(favourites.filter(fav=>fav.id !== movie.id));
+        removeFavourite(movie.id);
     }else{
-        setFavourites([...favourites,movie]);
+        addFavourite(movie.id);
     }
   }
 
-   const isFavourite = (movieId) =>
-    favourites.some((fav) => fav.id === movieId);
+   const isFavourite = (movieId) => favouriteIds.includes(movieId);
 
   if (loading) return <Text>Loading...</Text>;
 
