@@ -10,7 +10,12 @@ export default function FavouritesScreen() {
     const { favouriteIds, addFavourite, removeFavourite } = useContext(FavouritesContext);
     const { popularMovies, topRatedMovies, upcomingMovies } = useContext(MoviesContext);
 
-    const allMovies = [...popularMovies, ...topRatedMovies, ...upcomingMovies];
+    const movieMap = new Map();
+    [...popularMovies, ...topRatedMovies, ...upcomingMovies].forEach((movie) => {
+        movieMap.set(movie.id, movie);
+    });
+
+    const allMovies = Array.from(movieMap.values()); //UNIQUE Movies
 
     const favouriteMovies = allMovies.filter(movie => favouriteIds.includes(movie.id));
 

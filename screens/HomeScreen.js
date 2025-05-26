@@ -6,113 +6,118 @@ import MovieCard from '../components/MovieCard';
 import { FavouritesContext } from '../context/FavouritesContextProvider';
 
 export default function HomeScreen() {
-  const {popularMovies, topRatedMovies, upcomingMovies, loading} = useContext(MoviesContext);
-  const allMovies = [...topRatedMovies,...popularMovies, ...upcomingMovies];
+    const { popularMovies, topRatedMovies, upcomingMovies, loading } = useContext(MoviesContext);
 
-  const { favouriteIds, addFavourite, removeFavourite } = useContext(FavouritesContext);
-
-  const [selectedCategory, setSelectedCategory] = useState('popular');
-  const [searchText, setSearchText] = useState('');
-
-  const getFilteredMovies = () => {
-    let list = [];
-    switch (selectedCategory) {
-        case 'all_movies':
-            list = allMovies;
-            break
-        case 'popular':
-            list = popularMovies;
-            break;
-        case 'top_rated':
-            list = topRatedMovies;
-            break;
-        case 'upcoming':
-            list = upcomingMovies;
-            break;
-    }
-    
-    return list.filter((movie)=>{
-        return movie.title.toLowerCase().includes(searchText.toLowerCase());
+    const movieMap = new Map();
+    [...topRatedMovies,...popularMovies, ...upcomingMovies].forEach((movie) => {
+        movieMap.set(movie.id, movie);
     });
-  };
+    const allMovies = Array.from(movieMap.values());
 
-  const filteredMovies = getFilteredMovies();
+    const { favouriteIds, addFavourite, removeFavourite } = useContext(FavouritesContext);
 
-  const toggleFav = (movie)=>{
-    const exist = favouriteIds.includes(movie.id);
-    if(exist){
-        removeFavourite(movie.id);
-    }else{
-        addFavourite(movie.id);
+    const [selectedCategory, setSelectedCategory] = useState('all_movies');
+    const [searchText, setSearchText] = useState('');
+
+    const getFilteredMovies = () => {
+        let list = [];
+        switch (selectedCategory) {
+            case 'all_movies':
+                list = allMovies;
+                break
+            case 'popular':
+                list = popularMovies;
+                break;
+            case 'top_rated':
+                list = topRatedMovies;
+                break;
+            case 'upcoming':
+                list = upcomingMovies;
+                break;
+        }
+
+        return list.filter((movie) => {
+            return movie.title.toLowerCase().includes(searchText.toLowerCase());
+        });
+    };
+
+    const filteredMovies = getFilteredMovies();
+
+    const toggleFav = (movie) => {
+        const exist = favouriteIds.includes(movie.id);
+        if (exist) {
+            removeFavourite(movie.id);
+        } else {
+            addFavourite(movie.id);
+        }
     }
-  }
 
-   const isFavourite = (movieId) => favouriteIds.includes(movieId);
+    const isFavourite = (movieId) => favouriteIds.includes(movieId);
 
-  if (loading) return <Text>Loading...</Text>;
+    if (loading) return <Text>Loading...</Text>;
 
-  return (
-    <View style={styles.container}>
+    return (
+        <View style={styles.container}>
 
-        <View style={styles.inputPart}>
-            <TextInput 
-                placeholder='Search for a movie' 
-                style={styles.textInput}
-                onChangeText={setSearchText}
-                value={searchText}
-            ></TextInput>
-            <Picker
-                selectedValue={selectedCategory}
-                onValueChange={(itemValue) => setSelectedCategory(itemValue)}
-                style={styles.picker}
-            >
-                <Picker.Item label="All Movies" value="all_movies" />
-                <Picker.Item label="Popular" value="popular" />
-                <Picker.Item label="Top Movies" value="top_rated" />
-                <Picker.Item label="Upcoming Movies" value="upcoming" />
-            </Picker>
+            <View style={styles.inputPart}>
+                <TextInput
+                    placeholder='Search for a movie'
+                    style={styles.textInput}
+                    onChangeText={setSearchText}
+                    value={searchText}
+                ></TextInput>
+                <Picker
+                    selectedValue={selectedCategory}
+                    onValueChange={(itemValue) => setSelectedCategory(itemValue)}
+                    style={styles.picker}
+                >
+                    <Picker.Item label="All Movies" value="all_movies" />
+                    <Picker.Item label="Popular" value="popular" />
+                    <Picker.Item label="Top Movies" value="top_rated" />
+                    <Picker.Item label="Upcoming Movies" value="upcoming" />
+                </Picker>
+            </View>
+
+
+            <FlatList
+                data={filteredMovies}
+                keyExtractor={(item, index) => (item.id + index).toString()}
+                renderItem={({ item }) => (
+                    <MovieCard
+                        movie={item}
+                        isFavourite={isFavourite(item.id)}
+                        onToggleFavourite={toggleFav}
+                    ></MovieCard>
+                )}
+            />
         </View>
-      
-
-        <FlatList
-            data={filteredMovies}
-            keyExtractor={(item,index) => (item.id+index).toString()}
-            renderItem={({ item }) => (
-                <MovieCard 
-                    movie={item} 
-                    isFavourite={isFavourite(item.id)} 
-                    onToggleFavourite = {toggleFav}
-                ></MovieCard>
-            )}
-        />
-    </View>
-  );
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 10,
-  },
-  inputPart:{
-    flexDirection:'row',
-    gap:5,
-    marginBottom:10
-  },
-  textInput: {
-    flex: 5,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  picker: {
-    flex: 1,
-  },
+    container: {
+        flex: 1,
+        padding: 10,
+    },
+    inputPart: {
+        flexDirection: 'row',
+        gap: 5,
+        marginBottom: 10
+    },
+    textInput: {
+        flex: 5,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+    },
+    picker: {
+        flex: 1,
+    },
 
-  movie: {
-    fontSize: 16,
-    padding: 8,
-  },
+    movie: {
+        fontSize: 16,
+        padding: 8,
+    },
 });
